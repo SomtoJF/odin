@@ -5,7 +5,11 @@ import (
 
 	"github.com/SomtoJF/odin/core/api"
 	"github.com/SomtoJF/odin/core/state"
+	"github.com/SomtoJF/odin/ui/components/inputfield"
 	introascii "github.com/SomtoJF/odin/ui/components/introascii"
+	"github.com/SomtoJF/odin/ui/components/messageview"
+	"github.com/SomtoJF/odin/ui/components/statusbar"
+	"github.com/SomtoJF/odin/ui/components/todolist"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -62,37 +66,19 @@ func (ui *UI) Run() error {
 func (ui *UI) initializeComponents() {
 	// Intro ASCII banner
 	introComponent := introascii.NewComponent()
-	ui.banner = tview.NewTextView().
-		SetText(introComponent.IntroASCII()).
-		SetTextAlign(tview.AlignCenter).
-		SetDynamicColors(false)
-	// banner.SetBorder(true).SetTitle("Odin Code")
+	ui.banner = introComponent.IntroASCII()
 
 	// Message view (conversation history)
-	ui.messageView = tview.NewTextView().
-		SetDynamicColors(true).
-		SetScrollable(true).
-		SetChangedFunc(func() {
-			ui.app.Draw()
-		})
-	ui.messageView.SetBorder(true).SetTitle("Messages")
+	ui.messageView = messageview.NewComponent(ui.app).MessageView()
 
 	// Todo list
-	ui.todoList = tview.NewList().
-		ShowSecondaryText(false)
-	ui.todoList.SetBorder(true).SetTitle("TODOs")
+	ui.todoList = todolist.NewComponent(ui.app).TodoList()
 
 	// Input field
-	ui.inputField = tview.NewInputField().
-		SetLabel("> ").
-		SetFieldWidth(0)
-	ui.inputField.SetBorder(true).SetTitle("Input")
+	ui.inputField = inputfield.NewComponent(ui.app).InputField()
 
 	// Status bar
-	ui.statusBar = tview.NewTextView().
-		SetDynamicColors(true).
-		SetText(fmt.Sprintf("[Mode: %s] [Status: Idle]", ui.currentMode))
-	ui.statusBar.SetBorder(true).SetTitle("Status")
+	ui.statusBar = statusbar.NewComponent(ui.app).StatusBar(ui.currentMode)
 }
 
 // buildLayout creates the UI layout structure
