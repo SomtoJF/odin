@@ -37,7 +37,7 @@ func ProcessMessage(s *State, body string, mode AgentMode) {
 	message := Message{Body: body}
 	s.MessagesMx.Lock()
 	s.Messages = append(s.Messages, message)
-	messageIndex := len(s.Messages) - 1
+	_ = len(s.Messages) - 1 // messageIndex for future use
 	s.MessagesMx.Unlock()
 
 	// TODO: Get tools for this mode

@@ -20,6 +20,9 @@ core/
 │   ├── agent.go     # Agent interface
 │   ├── mainagent/   # Main agent implementation
 │   └── subagent/    # Sub-agent implementation
+├── api/             # Backend API layer
+│   ├── backend.go   # Backend with channel-based communication
+│   └── types.go     # Request/Response types
 ├── cache/           # File caching system (future)
 ├── planner/         # Planning and decision logic
 │   └── planner.go   # Planner types and functions
@@ -29,6 +32,11 @@ core/
 │   └── handler.go   # Message handling
 └── tools/           # Tool system
     └── tool.go      # Tool interface and registry
+
+ui/
+├── ui.go            # Main UI with channel-based backend communication
+└── components/      # UI components
+    └── introascii/  # ASCII art component
 ```
 
 ## Key Features
@@ -52,6 +60,13 @@ core/
 - **Main Agent**: Primary agent with full capabilities
 - **Sub-Agents**: Spawned for specific tasks, cannot spawn other sub-agents
 - **Thread-Safe**: All state mutations protected by mutexes
+
+### Frontend/Backend Separation
+
+- **Channel-Based Communication**: UI and backend communicate via Go channels
+- **Decoupled Architecture**: UI has no direct access to State or MainAgent
+- **Real-Time Updates**: Backend publishes state snapshots every 100ms
+- **Request/Response Model**: UI sends requests, backend processes them asynchronously
 
 ## Building and Running
 
@@ -91,6 +106,11 @@ make run
 - ✅ Planner types and interface
 - ✅ Message handling and queuing logic
 - ✅ File cache types and operations
+- ✅ **Backend API layer with channel-based communication**
+- ✅ **Complete TUI implementation with tview**
+- ✅ **Message view, input field, todo list, status bar**
+- ✅ **Frontend/Backend separation via Go channels**
+- ✅ **Mode switching (Ctrl+A: Ask, Ctrl+E: Edit, Ctrl+P: Plan)**
 
 ### TODO
 
@@ -98,10 +118,9 @@ make run
 - [ ] Implement individual tools (LS, Grep, Glob, etc.)
 - [ ] Add LLM-based cache validation for EditTool
 - [ ] Implement message processing iteration loop
-- [ ] Build TUI components for agent interaction
 - [ ] Add configuration file support (odinconfig.json)
 - [ ] Implement ODIN.md custom instructions
-- [ ] Add Redis state publishing
+- [ ] Add Redis state publishing (optional)
 - [ ] Implement ContextSummarizer tool
 - [ ] Add WebFetch tool with HTML-to-markdown conversion
 
@@ -109,14 +128,31 @@ make run
 
 For detailed architecture information, see [design/DESIGN.md](design/DESIGN.md).
 
+### Channel-Based Communication Flow
+
+```
+┌─────────────────┐           Channels            ┌─────────────────┐
+│                 │  ─────────────────────────>   │                 │
+│   UI (Client)   │    Request (string, mode)     │  Backend (API)  │
+│   - tview       │                                │  - MainAgent    │
+│   - components  │  <─────────────────────────   │  - State        │
+│                 │   StateSnapshot (100ms)        │  - Planner      │
+└─────────────────┘                                └─────────────────┘
+        ↑                                                   │
+        │                                                   │
+        └───────────── UpdateChan (real-time) ────────────┘
+```
+
 ### Message Processing Flow
 
-1. Message received → Check if agent is busy
-2. If busy → Add to queue, if idle → Start processing
-3. Set executing state and mode
-4. Run iteration loop: `Planner → Tool Call → Planner`
-5. Return answer to user
-6. Process next queued message
+1. **UI sends request** → User types message, hits Enter
+2. **Request sent via channel** → `backend.RequestChan <- Request{Message, Mode}`
+3. **Backend receives** → HandleIncomingMessage() called
+4. **Check if busy** → If busy, add to queue; if idle, process immediately
+5. **Processing** → Run iteration loop: `Planner → Tool Call → Planner`
+6. **State updates** → Backend publishes snapshots every 100ms
+7. **UI updates** → Receives snapshots, updates message view/todos/status
+8. **Complete** → Process next queued message
 
 ### Tool System
 
