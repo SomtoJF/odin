@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	components "github.com/SomtoJF/odin/ui"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	ui := components.NewUI()
+	ui.Run()
 }

@@ -2,12 +2,15 @@ module github.com/SomtoJF/odin
 
 go 1.25.3
 
+require github.com/rivo/tview v0.42.1-0.20250929082832-e113793670e2
+
 require (
-	github.com/fatih/color v1.9.0 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/githubnemo/CompileDaemon v1.4.0 // indirect
-	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/mattn/go-isatty v0.0.11 // indirect
-	github.com/radovskyb/watcher v1.0.7 // indirect
-	golang.org/x/sys v0.0.0-20191026070338-33540a1f6037 // indirect
+	github.com/gdamore/encoding v1.0.1 // indirect
+	github.com/gdamore/tcell/v2 v2.8.1 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/term v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 )
