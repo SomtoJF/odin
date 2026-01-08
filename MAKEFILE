@@ -1,0 +1,4 @@
+run: 
+	CompileDaemon -build="go build -o odin main.go" -command="./odin" -exclude-dir="vendor"
+
+.PHONY: run
